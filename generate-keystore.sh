@@ -1,6 +1,22 @@
-#!/bin/bash
+#!/bin/sh
 set -e
-mkdir -p keystore
-# Generate a self-signed RSA keypair in a JKS keystore
-keytool -genkeypair -alias jwtkey -keyalg RSA -keysize 2048 -storetype JKS -keystore keystore/keystore.jks -validity 3650 -storepass changeIt -keypass changeIt -dname "CN=local, OU=dev, O=example, L=City, ST=State, C=FR"
-echo "Created keystore/keystore.jks with alias 'jwtkey' and password 'changeit'. Change passwords for production."
+
+KEYSTORE_PATH="$1"
+
+KEYSTORE_DIR=$(dirname "$KEYSTORE_PATH")
+mkdir -p "$KEYSTORE_DIR"
+
+echo "[INFO] Génération d’un nouveau keystore au chemin : $KEYSTORE_PATH"
+
+keytool -genkeypair \
+    -alias jwtkey \
+    -keyalg RSA \
+    -keysize 2048 \
+    -validity 3650 \
+    -storetype JKS \
+    -keystore "$KEYSTORE_PATH" \
+    -storepass "${APP_KEYSTORE_PASSWORD:-Genius@Keypass1}" \
+    -keypass "${APP_KEY_PASSWORD:-Genius@Keypass1}" \
+    -dname "CN=confidential-docs, OU=Dev, O=App, L=City, ST=State, C=FR"
+
+echo "[INFO] Nouveau keystore généré."

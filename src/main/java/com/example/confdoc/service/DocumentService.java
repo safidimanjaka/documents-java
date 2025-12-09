@@ -1,6 +1,5 @@
 package com.example.confdoc.service;
 
-import java.io.File;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,21 +66,6 @@ public class DocumentService {
         User requester = userRepo.findByUsername(username).orElseThrow();
         if (!canRead(d, requester)) throw new SecurityException("Accès refusé");
         return cryptoService.decryptFromFile(d.getFilePath(), d.getWrappedKey());
-    }
-
-    public List<Document> listDocuments(String username) {
-        User requester = userRepo.findByUsername(username).orElseThrow();
-        Role role = requester.getRole();
-        if (role == Role.DIRECTOR) {
-            return documentRepository.findAll();
-        } else if (role == Role.DEPT_HEAD) {
-            if (requester.getDepartment() == null) return new ArrayList<>();
-            return documentRepository.findByDepartment(requester.getDepartment());
-        } else if (role == Role.EMPLOYEE) {
-            return documentRepository.findByOwner(requester);
-        } else { // USER
-            return documentRepository.findByOwner(requester);
-        }
     }
 
     public List<Document> listDocuments() {

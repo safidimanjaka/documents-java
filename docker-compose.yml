@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  database:
+    image: postgres:15
+    container_name: confdb
+    restart: always
+    environment:
+      POSTGRES_DB: confdocdb
+      POSTGRES_USER: confdocdb_user
+      POSTGRES_PASSWORD: 51uJfYX71djjo8DJHpDDJjkTloY9lcId
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - confnet
+
+  webservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: confidential-docs-api
+    restart: always
+    depends_on:
+      - database
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://database:5432/confdocdb?sslmode=disable"
+      SPRING_DATASOURCE_USERNAME: "postgres"
+      SPRING_DATASOURCE_PASSWORD: "postgres"
+
+      APP_KEYSTORE_PATH: "/app/keystore/keystore.jks"
+      APP_KEYSTORE_PASSWORD: "Genius@Keypass1"
+      APP_KEYSTORE_ALIAS: "jwtkey"
+      APP_KEYSTORE_KEY_PASSWORD: "Genius@Keypass1"
+
+      APP_STORAGE_DIR: "/app/keystore/storage"
+
+      SUPABASE_URL: "https://aqzawbrlhzumygbzeoyo.supabase.co"
+      SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxemF3YnJsaHp1bXlnYnplb3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjUyOTIsImV4cCI6MjA4MDQ0MTI5Mn0.53nqHoxLfus9Pk88OiRTAV7w5nO096evqMFEExAg0R8"
+      SUPABASE_BUCKET: "documents"
+      SUPABASE_SECURE_PATH: "secure"
+
+      JWT_EXPIRATION_MS: "3600000"
+
+      CORS_ALLOWED_ORIGINS: "http://localhost:5173,http://localhost:3000"
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - keystore_data:/app/keystore
+      - storage_data:/app/keystore/storage
+
+    networks:
+      - confnet
+
+volumes:
+  db_data:
+  keystore_data:
+  storage_data:
+
+networks:
+  confnet:
+    driver: bridge
