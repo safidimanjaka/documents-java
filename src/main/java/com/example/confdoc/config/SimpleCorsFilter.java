@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-@Component
+//@Component
 public class SimpleCorsFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleCorsFilter.class);

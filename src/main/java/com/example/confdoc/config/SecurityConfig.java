@@ -20,6 +20,7 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+
     private final JwtFilter jwtFilter;
 
     public SecurityConfig(JwtFilter jwtFilter) {
@@ -36,7 +37,6 @@ public class SecurityConfig {
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
@@ -48,7 +48,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Autorisation des requêtes WS (POUR LE HANDSHAKE)
                         .requestMatchers("/ws/**").permitAll()
-
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/", "/error", "/actuator/**", "/static/**").permitAll()
                         .requestMatchers("/index.html").permitAll()
@@ -69,13 +68,12 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // IMPORTANT : Définir explicitement les origines
-        configuration.setAllowedOrigins(List.of(
+        configuration.setAllowedOriginPatterns(List.of(
+                "null",
                 "http://localhost:5173",       // Localhost Vite
-                "https://*.vercel.app",        // Vercel (avec wildcard pour sous-domaines)
-                "https://*.netlify.app",       // Netlify (avec wildcard pour sous-domaines)
-                "https://document-app-vb2v.onrender.com" // Si besoin
-                // Ajoutez d'autres origines exactes de production si possible (ex: https://mon-app.com)
+                "https://*.vercel.app*",        // Vercel (avec wildcard pour sous-domaines)
+                "https://*.netlify.app*",       // Netlify (avec wildcard pour sous-domaines)
+                "https://document-app-vb2v.onrender.com"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
